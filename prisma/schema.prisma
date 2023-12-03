@@ -1,0 +1,64 @@
+// Import statements, if needed
+
+// Generator and Datasource
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum TypeInteraction {
+  LIKED
+  EDUCATIONAL
+  AWESOME
+}
+
+// User Model
+model User {
+  id          String        @id @default(uuid())
+  createdAt   DateTime      @default(now())
+  updateAt    DateTime      @updatedAt
+  email       String        @unique
+  password    String
+  username    String
+  article     Article[]
+  follower    Follower[]
+  interaction Interaction[]
+}
+
+// Interaction Model
+model Interaction {
+  id          String          @id @default(uuid())
+  createdAt   DateTime        @default(now())
+  updateAt    DateTime        @updatedAt
+  userId      String?
+  articleId   String?
+  interaction TypeInteraction @default(LIKED)
+  User        User?           @relation(fields: [userId], references: [id])
+  Article     Article?        @relation(fields: [articleId], references: [id])
+}
+
+// Article Model
+model Article {
+  id          String        @id @default(uuid())
+  createdAt   DateTime      @default(now())
+  updateAt    DateTime      @updatedAt
+  title       String
+  content     String
+  publishDate DateTime
+  userId      String?
+  User        User?         @relation(fields: [userId], references: [id])
+  interaction Interaction[]
+}
+
+// Follower Model
+model Follower {
+  id             String   @id @default(uuid())
+  User           User?    @relation(fields: [uuidFrequently], references: [id])
+  beginningDate  DateTime
+  uuidFrequently String?
+}
